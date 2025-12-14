@@ -22,12 +22,18 @@ spec:
             - name: SONAR_ES_BOOTSTRAP_CHECKS_DISABLE
               value: "true"
           resources:
-            limits:
-              memory: "2Gi"
-              cpu: "1"
             requests:
               memory: "1Gi"
               cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+          volumeMounts:
+            - name: sonarqube-data
+              mountPath: /opt/sonarqube/data
+      volumes:
+        - name: sonarqube-data
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -35,8 +41,10 @@ metadata:
   name: sonarqube
   namespace: devops
 spec:
+  type: NodePort
   selector:
     app: sonarqube
   ports:
     - port: 9000
       targetPort: 9000
+      nodePort: 30090
