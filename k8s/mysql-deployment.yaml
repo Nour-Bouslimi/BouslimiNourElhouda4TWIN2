@@ -9,24 +9,24 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/data/mysql"
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pvc
+  namespace: devops
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
+  namespace: devops
 spec:
   replicas: 1
   selector:
@@ -41,10 +41,8 @@ spec:
         - name: mysql
           image: mysql:8.0
           env:
-            - name: MYSQL_ALLOW_EMPTY_PASSWORD
-              value: "yes"
             - name: MYSQL_ROOT_PASSWORD
-              value: ""
+              value: root
             - name: MYSQL_DATABASE
               value: studentdb
           ports:
@@ -56,12 +54,12 @@ spec:
         - name: mysql-storage
           persistentVolumeClaim:
             claimName: mysql-pvc
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mysql-service
+  namespace: devops
 spec:
   selector:
     app: mysql
